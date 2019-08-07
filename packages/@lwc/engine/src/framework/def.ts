@@ -35,10 +35,12 @@ import {
 } from './utils';
 import {
     ComponentConstructor,
+    ComponentInterface,
     ErrorCallback,
     ComponentMeta,
     getComponentRegisteredMeta,
 } from './component';
+import { valueObserved, valueMutated } from '../libs/mutation-tracker';
 import { Template } from './template';
 
 export interface ComponentDef extends DecoratorMeta {
@@ -81,6 +83,40 @@ function getCtorProto(Ctor: any, subclassComponentName: string): ComponentConstr
     return proto as ComponentConstructor;
 }
 
+function createObservedPropertyDescriptor(Ctor: any, key: PropertyKey): PropertyDescriptor {
+    return {
+        get(this: ComponentInterface): any {
+            const vm = getComponentVM(this);
+            if (process.env.NODE_ENV !== 'production') {
+                assert.isTrue(vm && 'cmpRoot' in vm, `${vm} is not a valid vm.`);
+            }
+            valueObserved(this, key);
+            return vm.cmpFields[key];
+        },
+        set(this: ComponentInterface, newValue: any) {
+            const vm = getComponentVM(this);
+            if (process.env.NODE_ENV !== 'production') {
+                assert.isTrue(vm && 'cmpRoot' in vm, `${vm} is not a valid vm.`);
+                assert.invariant(
+                    !isRendering,
+                    `${vmBeingRendered}.render() method has side effects on the state of ${vm}.${String(
+                        key
+                    )}`
+                );
+            }
+
+            if (newValue !== vm.cmpFields[key]) {
+                vm.cmpFields[key] = newValue;
+                if (isFalse(vm.isDirty)) {
+                    valueMutated(this, key);
+                }
+            }
+        },
+        enumerable: true,
+        configurable: true,
+    };
+}
+
 function createComponentDef(
     Ctor: ComponentConstructor,
     meta: ComponentMeta,
@@ -104,11 +140,13 @@ function createComponentDef(
     let methods: MethodDef = {};
     let wire: WireHash | undefined;
     let track: TrackDef = {};
+    let fields: string[] | undefined;
     if (!isUndefined(decoratorsMeta)) {
         props = decoratorsMeta.props;
         methods = decoratorsMeta.methods;
         wire = decoratorsMeta.wire;
         track = decoratorsMeta.track;
+        fields = decoratorsMeta.fields;
     }
     const proto = Ctor.prototype;
 
@@ -119,6 +157,14 @@ function createComponentDef(
         errorCallback,
         render,
     } = proto;
+
+    if (fields) {
+        for (let i = 0, len = fields.length; i < len; i += 1) {
+            const fieldDescriptor = createObservedPropertyDescriptor(target, fields[i]);
+            defineProperty(target, fields[i], fieldDescriptor);
+        }
+    }
+
     const superProto = getCtorProto(Ctor, subclassComponentName);
     const superDef: ComponentDef | null =
         (superProto as any) !== BaseLightningElement
