@@ -5,11 +5,15 @@
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
 import { ENABLE_REACTIVE_SETTER } from '@lwc/features';
-import { assert, isFalse, isFunction, isObject, isTrue, isUndefined, toString } from '@lwc/shared';
+import { assert, isFalse, isFunction, isTrue, isUndefined, toString } from '@lwc/shared';
 import { logError } from '../../shared/assert';
 import { isRendering, vmBeingRendered, isBeingConstructed } from '../invoker';
-import { componentValueObserved, componentValueMutated } from '../mutation-tracker';
-import { ComponentInterface, ComponentConstructor } from '../component';
+import {
+    componentValueObserved,
+    componentValueMutated,
+    ReactiveObserver,
+} from '../mutation-tracker';
+import { ComponentInterface } from '../component';
 import { getComponentVM, rerenderVM } from '../vm';
 import { addCallbackToNextTick } from '../utils';
 
