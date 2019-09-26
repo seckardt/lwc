@@ -8,7 +8,7 @@ import { ENABLE_REACTIVE_SETTER } from '@lwc/features';
 import { assert, isFalse, isFunction, isObject, isTrue, isUndefined, toString } from '@lwc/shared';
 import { logError } from '../../shared/assert';
 import { isRendering, vmBeingRendered, isBeingConstructed } from '../invoker';
-import { valueObserved, valueMutated, ReactiveObserver } from '../../libs/mutation-tracker';
+import { componentValueObserved, componentValueMutated } from '../mutation-tracker';
 import { ComponentInterface, ComponentConstructor } from '../component';
 import { getComponentVM, rerenderVM } from '../vm';
 import { addCallbackToNextTick } from '../utils';
@@ -45,7 +45,7 @@ export function createPublicPropertyDescriptor(key: string): PropertyDescriptor 
                 }
                 return;
             }
-            valueObserved(this, key);
+            componentValueObserved(vm, key);
             return vm.cmpProps[key];
         },
         set(this: ComponentInterface, newValue: any) {
@@ -61,11 +61,7 @@ export function createPublicPropertyDescriptor(key: string): PropertyDescriptor 
             }
             vm.cmpProps[key] = newValue;
 
-            // avoid notification of observability if the instance is already dirty
-            if (isFalse(vm.isDirty)) {
-                // perf optimization to skip this step if the component is dirty already.
-                valueMutated(this, key);
-            }
+            componentValueMutated(vm, key);
         },
         enumerable: true,
         configurable: true,

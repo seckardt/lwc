@@ -18,7 +18,6 @@ import {
     defineProperties,
     fields,
     freeze,
-    isFalse,
     isFunction,
     isNull,
     seal,
@@ -36,7 +35,7 @@ import {
 import { ViewModelReflection, EmptyObject } from './utils';
 import { vmBeingConstructed, isBeingConstructed, isRendering, vmBeingRendered } from './invoker';
 import { getComponentVM, VM } from './vm';
-import { valueObserved, valueMutated } from '../libs/mutation-tracker';
+import { componentValueMutated, componentValueObserved } from './mutation-tracker';
 import { dispatchEvent } from '../env/dom';
 import { patchComponentWithRestrictions, patchShadowRootWithRestrictions } from './restrictions';
 import { unlockAttribute, lockAttribute } from './attributes';
@@ -91,7 +90,7 @@ function createBridgeToElementDescriptor(
                 }
                 return;
             }
-            valueObserved(this, propName);
+            componentValueObserved(vm, propName);
             return get.call(vm.elm);
         },
         set(this: ComponentInterface, newValue: any) {
@@ -116,10 +115,8 @@ function createBridgeToElementDescriptor(
 
             if (newValue !== vm.cmpProps[propName]) {
                 vm.cmpProps[propName] = newValue;
-                if (isFalse(vm.isDirty)) {
-                    // perf optimization to skip this step if not in the DOM
-                    valueMutated(this, propName);
-                }
+
+                componentValueMutated(vm, propName);
             }
             return set.call(vm.elm, newValue);
         },

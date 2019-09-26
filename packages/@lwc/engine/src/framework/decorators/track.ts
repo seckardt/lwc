@@ -4,9 +4,9 @@
  * SPDX-License-Identifier: MIT
  * For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/MIT
  */
-import { assert, isFalse } from '@lwc/shared';
+import { assert } from '@lwc/shared';
 import { isRendering, vmBeingRendered } from '../invoker';
-import { valueObserved, valueMutated } from '../../libs/mutation-tracker';
+import { componentValueObserved, componentValueMutated } from '../mutation-tracker';
 import { getComponentVM } from '../vm';
 import { reactiveMembrane } from '../membrane';
 import { ComponentInterface } from '../component';
@@ -36,7 +36,7 @@ export function internalTrackDecorator(key: string): PropertyDescriptor {
             if (process.env.NODE_ENV !== 'production') {
                 assert.isTrue(vm && 'cmpRoot' in vm, `${vm} is not a vm.`);
             }
-            valueObserved(this, key);
+            componentValueObserved(vm, key);
             return vm.cmpFields[key];
         },
         set(this: ComponentInterface, newValue: any) {
@@ -53,10 +53,8 @@ export function internalTrackDecorator(key: string): PropertyDescriptor {
             const reactiveOrAnyValue = reactiveMembrane.getProxy(newValue);
             if (reactiveOrAnyValue !== vm.cmpFields[key]) {
                 vm.cmpFields[key] = reactiveOrAnyValue;
-                if (isFalse(vm.isDirty)) {
-                    // perf optimization to skip this step if the track property is on a component that is already dirty
-                    valueMutated(this, key);
-                }
+
+                componentValueMutated(vm, key);
             }
         },
         enumerable: true,
