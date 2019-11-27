@@ -11,7 +11,7 @@
     "clean": "lerna run clean && lerna clean --yes && rm -rf node_modules",
     "lint": "eslint packages/ scripts/ --ext=js,ts --rulesdir=./scripts/eslint/rules",
     "format": "prettier --write '{packages,scripts}/**/*.{js,ts,json,md}'",
-    "build": "lerna run build --ignore perf-benchmarks --ignore integration-tests",
+    "build": "lerna run build --ignore perf-benchmarks --ignore integration-tests --ignore ssr-tests",
     "test": "jest --config ./scripts/jest/root.config.js",
     "test:debug": "node --inspect node_modules/.bin/jest --config ./scripts/jest/root.config.js --runInBand --watch",
     "test:ci": "yarn test --no-cache --coverage --runInBand",
@@ -88,7 +88,8 @@
     "packages/lwc",
     "packages/integration-karma",
     "packages/integration-tests",
-    "packages/perf-benchmarks"
+    "packages/perf-benchmarks",
+    "packages/ssr-tests"
   ],
   "engines": {
     "node": ">=10.16.3 <10.17.0",
