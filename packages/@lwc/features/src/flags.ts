@@ -15,6 +15,9 @@ const featureFlagLookup: FeatureFlagLookup = {
     ENABLE_NODE_LIST_PATCH: null,
     ENABLE_HTML_COLLECTIONS_PATCH: null,
     ENABLE_NODE_PATCH: null,
+
+    // Flag to control Server Side Rendering
+    ENABLE_SSR: false,
 };
 export default featureFlagLookup;
 

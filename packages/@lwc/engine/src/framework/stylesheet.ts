@@ -43,10 +43,12 @@ function getCachedStyleElement(styleContent: string): HTMLStyleElement {
     return fragment.cloneNode(true).firstChild as HTMLStyleElement;
 }
 
-const globalStyleParent = document.head || document.body || document;
+// PHIL: moved parent access down to the function that uses it
 const InsertedGlobalStyleContent: Record<string, true> = create(null);
 
 function insertGlobalStyle(styleContent: string) {
+    // PHIL: access the parent when needed
+    const globalStyleParent = document.head || document.body || document;
     // inserts the global style when needed, otherwise does nothing
     if (isUndefined(InsertedGlobalStyleContent[styleContent])) {
         InsertedGlobalStyleContent[styleContent] = true;

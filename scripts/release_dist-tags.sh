@@ -21,7 +21,7 @@ if [[ ${CURRENT_TAG} = ${LWC_VERSION} ]]; then
   exit 0;
 fi
 
-CMD_UPDATE_TAGS="lerna exec --ignore perf-benchmarks --ignore integration-tests -- npm dist-tag add \$LERNA_PACKAGE_NAME@${LWC_VERSION} ${TAG_NAME}"
+CMD_UPDATE_TAGS="lerna exec --ignore perf-benchmarks --ignore integration-tests --ignore ssr-tests -- npm dist-tag add \$LERNA_PACKAGE_NAME@${LWC_VERSION} ${TAG_NAME}"
 
 echo $CMD_UPDATE_TAGS
 $CMD_UPDATE_TAGS
