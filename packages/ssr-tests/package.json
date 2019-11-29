@@ -7,7 +7,7 @@
         "start": "node server.js"
     },
     "devDependencies": {
-        "@lwc/rollup-plugin": "1.1.8",
+        "@lwc/rollup-plugin": "1.1.13",
         "cross-env": "^5.2.0",
         "rollup": "^1.27.1",
         "rollup-plugin-commonjs": "^10.1.0",
@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "jsdom": "^15.2.1",
-        "lwc": "1.1.8"
+        "lwc": "1.1.13",
+        "url": "^0.11.0"
     }
 }

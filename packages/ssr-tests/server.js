@@ -1,4 +1,4 @@
-const main = require('./public/cjs/main.js');
+const main = require('./dist/cjs/main.js');
 
 console.log('');
 

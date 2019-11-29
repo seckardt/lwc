@@ -2,7 +2,10 @@
 // SSR utilities in the context of Node.js
 //
 
-import { JSDOM } from 'jsdom';
+// Looks like 'import' generates a warning with Node 10.x (12.x currently not supported by LWC)
+//import { JSDOM } from 'jsdom';
+const { JSDOM } = require('jsdom');
+const nodeUrl = require('url');
 
 // The LWC library patches this classes, so we define it globally
 //global.Element = domino.impl.Element;
@@ -19,50 +22,41 @@ global.Node = window.Node;
 
 const MAX_ASYNC_LOOPS = 4;
 
-//
-// Context for a SSR request
-// As of now, we do *not* execute in a VM, as it executes synchronously so we can setup the context on demand
-// Note that this code do not depend on Node APIs, so it can be executed on a JVM as well, with a recent JS
-// interpreter like GraalVM
-//
-const Talon = {
-    isServer: true,
-};
-
-// function extractQuery(s) {
-//     const idx = s.indexOf('?')
-//     return idx>=0 ? s.substring(idx) : "";
-// }
+function extractQuery(s) {
+    const idx = s.indexOf('?');
+    return idx >= 0 ? s.substring(idx) : '';
+}
 
 class SSRContext {
     constructor(options) {
-        // const serverContext = options.context;
-        // const req = serverContext.req;
-        // if(req) {
-        //     const query = extractQuery(req.originalUrl)
-        //     const url = (req && nodeUrl.format({
-        //         protocol: req.protocol,
-        //         host: req.get('host'),
-        //         pathname: req.path
-        //       })) + query;
-        //       this.window = createBrowserWindow(url);
-        // } else {
-        //     this.window = createBrowserWindow("http://locahost");
-        // }
+        this.options = options.context;
+
+        // Create the global window object
+        // It has to be kept global as data retriever can store some data for future use
+        const req = this.options && this.options.context && this.options.context && req;
+        if (req) {
+            const query = extractQuery(req.originalUrl);
+            const url =
+                (req &&
+                    nodeUrl.format({
+                        protocol: req.protocol,
+                        host: req.get('host'),
+                        pathname: req.path,
+                    })) + query;
+            this.window = new JSDOM('', { url }).window;
+        } else {
+            this.window = new JSDOM('', { url: 'http://localhost' }).window;
+        }
+        this.window['__lwc_ssr__'] = true;
     }
 
     install() {
-        // No URL handling for now
-        const dom = new JSDOM('');
-
-        global.window = dom.window;
-        global.document = dom.window.document;
-        global.Talon = Talon;
+        global.window = this.window;
+        global.document = this.window.document;
     }
     uninstall() {
-        delete global.window;
         delete global.document;
-        delete global.Talon;
+        delete global.window;
     }
 }
 
