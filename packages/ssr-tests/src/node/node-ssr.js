@@ -57,6 +57,9 @@ class SSRContext {
     uninstall() {
         delete global.document;
         delete global.window;
+        // Restore the global ones...
+        global.window = window;
+        global.document = window.document;
     }
 }
 
