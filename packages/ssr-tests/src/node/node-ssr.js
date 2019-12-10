@@ -27,6 +27,47 @@ function extractQuery(s) {
     return idx >= 0 ? s.substring(idx) : '';
 }
 
+/**
+ * This class carries the ssr context while rendering the components, as well as
+ * the promises that need to be resolved before the final rendering takes place.
+ */
+class RenderingContext {
+    promises: Promise<any>[] = [];
+    options: Options;
+    timeout: number;
+
+    constructor(options: Options) {
+        this.options = options;
+        this.timeout = (options && options.timeout) || 5 * 1000;
+    }
+    add(p: Promise<any>) {
+        if (p) {
+            this.promises.push(p);
+        }
+    }
+
+    getPromise(): Promise<any> | null {
+        if (this.promises.length > 0) {
+            return Promise.all(this.promises);
+        }
+        return null;
+    }
+}
+
+//------
+// PHIL: Here is how async rendering can happen
+//------
+if (options.asyncPromise) {
+    const p = options.asyncPromise.call(null, ce, ssrContext);
+    if (p && p.then) {
+        //console.log("Async rendering detected for component: "+ce.Ctor);
+        renderingContext.add(p);
+        // We stop here and we don't render the children
+        // But the peers will be rendered in case there are rendered simultaneously
+        return [];
+    }
+}
+
 class SSRContext {
     constructor(options) {
         this.options = options.context;
