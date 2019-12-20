@@ -29,4 +29,4 @@ export { buildCustomElementConstructor } from './wc';
 
 export { setFeatureFlag, setFeatureFlagForTest } from '@lwc/features';
 
-export { renderToString } from './ssr/index';
+export { renderToString } from './ssr';

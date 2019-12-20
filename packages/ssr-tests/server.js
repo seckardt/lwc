@@ -1,24 +1,22 @@
+const fs = require('fs');
+const path = require('path');
+const http = require('http');
 const main = require('./dist/cjs/main.js');
 
-console.log('');
-
-main.HelloWorld().then(html => {
-    console.log('Hello World');
-    console.log(html);
-    console.log('');
-});
-
-main.HelloWorldContainer().then(html => {
-    console.log('Hello World Container');
-    console.log(html);
-    console.log('');
-});
-
-main.LabelContainer().then(html => {
-    console.log('Label Container');
-    console.log(html);
-    console.log('');
-});
+http.createServer((req, res) => {
+    const content = fs.readFileSync(path.resolve(__dirname, 'server.html'), 'utf-8').trim();
+    Promise.all([main.StyledContainer(), main.HelloWorldContainer(), main.LabelContainer()]).then(
+        ([styled, hello, label]) => {
+            const html = `
+<section id="StyledContainer">${styled}</section>
+<section id="HelloWorldContainer">${hello}</section>
+<section id="LabelContainer">${label}</section>
+`;
+            res.write(content.replace('<section></section>', html));
+            res.end();
+        }
+    );
+}).listen(8080);
 
 // if (context.options.asyncData && (ce.constructor as any).prefetchAsyncData) {
 //     // The component properties are added to the context

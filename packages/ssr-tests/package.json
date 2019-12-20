@@ -4,6 +4,7 @@
     "private": true,
     "scripts": {
         "build": "cross-env rollup -c ./scripts/rollup.config.js",
+        "console": "node console.js",
         "start": "node server.js"
     },
     "devDependencies": {

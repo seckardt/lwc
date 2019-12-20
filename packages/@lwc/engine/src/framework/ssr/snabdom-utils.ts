@@ -41,3 +41,7 @@ export function isComment(node: VNode): boolean {
 export function isText(node: VNode): boolean {
     return node.sel === undefined;
 }
+
+export function isStyleSheet(node: VNode) {
+    return node.sel === 'style';
+}

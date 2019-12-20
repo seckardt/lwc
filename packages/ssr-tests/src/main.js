@@ -3,8 +3,8 @@ import { renderToString } from './node/node-ssr';
 import HelloWorld from './ssr/helloworld/helloworld';
 import HelloWorldContainer from './ssr/helloworldcontainer/helloworldcontainer';
 import LabelContainer from './ssr/labelcontainer/labelcontainer';
+import StyledContainer from './ssr/styledcontainer/styledcontainer';
 
-// Test HelloWorld
 export default {
     HelloWorld: () => {
         return renderToString('ssr-helloworld', { is: HelloWorld });
@@ -14,5 +14,8 @@ export default {
     },
     LabelContainer: () => {
         return renderToString('ssr-labelcontainer', { is: LabelContainer });
+    },
+    StyledContainer: () => {
+        return renderToString('ssr-styledcontainer', { is: StyledContainer });
     },
 };

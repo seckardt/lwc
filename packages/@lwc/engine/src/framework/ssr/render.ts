@@ -68,7 +68,7 @@ export function renderToString(sel: string, options: Options): string {
     }
 
     // Create the component to render
-    // Ths use of a DOM element is temporary here until LWC engine is fixed
+    // The use of a DOM element is temporary here until LWC engine is fixed
     const comp: ComponentInterface = (createElement(sel, {
         is,
     }) as unknown) as ComponentInterface;
@@ -91,8 +91,7 @@ export function renderToString(sel: string, options: Options): string {
     ssrRenderComponent(parent, getComponentVM(comp), options.shouldRender);
 
     // Serialize the result to HTML
-    const html = serializeVNode(parent);
-    return html;
+    return serializeVNode(parent);
 }
 
 // Temp export to the runtime

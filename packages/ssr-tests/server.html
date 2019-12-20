@@ -1,0 +1,45 @@
+<html>
+    <body onload="init();">
+        <style>
+            section[id] {
+                display: none;
+            }
+
+            section[id].is-active {
+                display: block;
+            }
+        </style>
+        <script>
+            const defaultId = 'StyledContainer';
+
+            function init() {
+                const selectEl = document.querySelector('select');
+                const hash = location.hash.replace('#', '') || defaultId;
+                Array.from(selectEl.options).forEach(option => {
+                    option.selected = option.value === hash;
+                });
+
+                const oldActiveSectionEl = document.querySelector(`section.is-active`);
+                oldActiveSectionEl && oldActiveSectionEl.classList.remove('is-active');
+
+                const activeSectionEl =
+                    document.querySelector(`section[id="${hash}"]`) ||
+                    document.querySelector(`section[id="${defaultId}"]`);
+                activeSectionEl.classList.add('is-active');
+            }
+
+            function handleSelect(value) {
+                location.assign('#' + value);
+                init();
+            }
+        </script>
+        <form>
+            <select onchange="handleSelect(this.value);">
+                <option value="StyledContainer">Styled Container</option>
+                <option value="HelloWorldContainer">Hello World Container</option>
+                <option value="LabelContainer">Label Container</option>
+            </select>
+        </form>
+        <section></section>
+    </body>
+</html>
