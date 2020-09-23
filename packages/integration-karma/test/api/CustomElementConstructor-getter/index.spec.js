@@ -2,6 +2,7 @@ import { LightningElement } from 'lwc';
 
 import ReflectElement from 'x/reflect';
 import LifecycleParent from 'x/lifecycleParent';
+import Nested from 'x/nested';
 
 // We can't register standard custom elements if we run compat because of the transformation applied to the component
 // constructor.
@@ -33,6 +34,15 @@ if (SUPPORTS_CUSTOM_ELEMENTS) {
 
         expect(elm.shadowRoot).not.toBe(null);
         expect(elm.shadowRoot.mode).toBe('open');
+    });
+
+    it('should create a custom element with a nested element of the same name', () =>{
+        const NestedCustomElement = Nested.CustomElementConstructor;
+        customElements.define('x-nested', NestedCustomElement);
+
+        const elm = document.createElement('x-nested');
+        elm.hasChild = true;
+        document.body.appendChild(elm);
     });
 
     describe('lifecycle', () => {
